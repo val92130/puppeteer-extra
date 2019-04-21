@@ -1,22 +1,5 @@
 'use strict'
 
-let Puppeteer
-try {
-  // https://github.com/GoogleChrome/puppeteer/pull/3208
-  Puppeteer = require('puppeteer')
-} catch (err) {
-  console.warn(`
-    Puppeteer is missing. :-)
-
-    Note: puppeteer is a peer dependency of puppeteer-extra,
-    which means you can install your own preferred version.
-
-    To get the latest stable verson run: 'yarn add puppeteer'
-    To get the latest tip-of-tree verson run: 'yarn add puppeteer@next'
-  `)
-  throw err
-}
-
 const merge = require('deepmerge')
 const debug = require('debug')('puppeteer-extra')
 
@@ -41,7 +24,27 @@ const debug = require('debug')('puppeteer-extra')
  * })()
  */
 class PuppeteerExtra {
-  constructor () {
+  constructor (puppeteer = null) {
+    if (!puppeteer) {
+      try {
+        // https://github.com/GoogleChrome/puppeteer/pull/3208
+        this.puppeteer = require('puppeteer')
+      } catch (err) {
+        console.warn(`
+Puppeteer is missing. :-)
+
+Note: puppeteer is a peer dependency of puppeteer-extra,
+which means you can install your own preferred version.
+
+To get the latest stable verson run: 'yarn add puppeteer'
+To get the latest tip-of-tree verson run: 'yarn add puppeteer@next'
+`);
+        throw err
+      }
+    } else {
+      this.puppeteer = puppeteer;
+    }
+
     this._plugins = []
 
     // Ensure there are certain properties (e.g. the `options.args` array)
@@ -104,7 +107,7 @@ class PuppeteerExtra {
     // Let's check requirements after plugin had the chance to modify the options
     this.checkPluginRequirements(opts)
 
-    const browser = await Puppeteer.launch(options)
+    const browser = await this.puppeteer.launch(options)
     this._patchPageCreationMethods(browser)
 
     await this.callPlugins('_bindBrowserEvents', browser, opts)
@@ -135,7 +138,7 @@ class PuppeteerExtra {
     // Let's check requirements after plugin had the chance to modify the options
     this.checkPluginRequirements(opts)
 
-    const browser = await Puppeteer.connect(options)
+    const browser = await this.puppeteer.connect(options)
     this._patchPageCreationMethods(browser)
 
     await this.callPlugins('_bindBrowserEvents', browser, opts)
@@ -367,7 +370,7 @@ class PuppeteerExtra {
    * @return {string}
    */
   executablePath () {
-    return Puppeteer.executablePath()
+    return this.puppeteer.executablePath()
   }
 
   /**
@@ -376,7 +379,7 @@ class PuppeteerExtra {
    * @return {Array<string>}
    */
   defaultArgs () {
-    return Puppeteer.defaultArgs()
+    return this.puppeteer.defaultArgs()
   }
 
   /**
@@ -386,8 +389,8 @@ class PuppeteerExtra {
    * @return {PuppeteerBrowserFetcher}
    */
   createBrowserFetcher (options) {
-    return Puppeteer.createBrowserFetcher(options)
+    return this.puppeteer.createBrowserFetcher(options)
   }
 }
 
-module.exports = new PuppeteerExtra()
+module.exports =PuppeteerExtra;
