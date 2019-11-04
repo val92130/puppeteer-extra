@@ -3,7 +3,7 @@
   "name": "puppeteer-extra",
   "description": "Modular framework to teach Puppeteer new tricks.",
   "repository": "berstend/puppeteer-extra",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "berstend",
   "license": "MIT",
   "main": "packages/puppeteer-extra/index.js",
