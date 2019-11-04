@@ -174,7 +174,7 @@ To get the latest tip-of-tree verson run: 'yarn add puppeteer@next'
    */
   _patchPageCreationMethods (browser) {
     browser._createPageInContext = (function (originalMethod, context) {
-      return async (contextId) => {
+      return async function (contextId) {
         const page = await originalMethod.apply(context, arguments)
         await page.goto('about:blank')
         return page
